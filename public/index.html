@@ -1,0 +1,1112 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yazıcı Toner Takip Sistemi</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sortable/0.8.0/js/sortable.min.js"></script>
+
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
+            --danger-color: #e74c3c;
+            --light-color: #ecf0f1;
+            --dark-color: #2c3e50;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px 0;
+            background-color: #f5f7fa;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 98%;
+            margin: 0 auto;
+        }
+        
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        h1 {
+            color: var(--primary-color);
+            margin: 0;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 10px;
+        }
+        
+        button {
+            padding: 8px 15px;
+            cursor: pointer;
+            border: none;
+            border-radius: 4px;
+            font-weight: 500;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #1a252f;
+        }
+        
+        .btn-success {
+            background-color: var(--success-color);
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background-color: #219653;
+        }
+        
+        .btn-refresh {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+        
+        .btn-refresh:hover {
+            background-color: #2980b9;
+        }
+        
+
+        
+        .status-badge {
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            color: white;
+        }
+        
+        .status-normal {
+            background-color: var(--success-color);
+        }
+        
+        .status-düşük {
+            background-color: var(--warning-color);
+        }
+        
+        .status-kritik {
+            background-color: var(--danger-color);
+        }
+        
+        .status-unknown {
+            background-color: #95a5a6;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            background-color: white;
+        }
+        
+        .sticky-table {
+            position: relative;
+        }
+        
+        th, td {
+            padding: 12px 15px;
+            text-align: center;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        th {
+            background-color: var(--primary-color);
+            color: white;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            box-shadow: 0 2px 2px -1px rgba(0,0,0,0.1);
+        }
+        
+        .sticky-thead th {
+            position: sticky;
+            top: 0;
+            background-color: var(--primary-color);
+            color: white;
+            z-index: 10;
+            box-shadow: 0 2px 2px -1px rgba(0,0,0,0.1);
+        }
+        
+        tr:hover {
+            background-color: rgba(52, 152, 219, 0.1);
+        }
+        
+        .toner-info {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        
+        .toner-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            background-color: #f8f9fa;
+            font-size: 13px;
+        }
+        
+        .toner-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+        
+        .black { background-color: #000; }
+        .cyan { background-color: #00bcd4; }
+        .magenta { background-color: #e91e63; }
+        .yellow { background-color: #ffeb3b; }
+        
+        .action-buttons {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .action-btn {
+            padding: 5px 10px;
+            font-size: 12px;
+            border-radius: 4px;
+            background-color: var(--light-color);
+            color: var(--dark-color);
+        }
+        
+        .action-btn:hover {
+            background-color: #d6eaf8;
+        }
+        
+        .delete-btn {
+            background-color: var(--danger-color) !important;
+            color: white !important;
+        }
+        
+        .delete-btn:hover {
+            background-color: #c0392b !important;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            overflow: auto;
+        }
+        
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 25px;
+            border-radius: 8px;
+            width: 60%;
+            max-width: 700px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+            animation: modalopen 0.3s;
+        }
+        
+        @keyframes modalopen {
+            from { opacity: 0; transform: translateY(-50px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .modal-title {
+            margin: 0;
+            color: var(--primary-color);
+        }
+        
+        .close {
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        .close:hover {
+            color: #333;
+        }
+        
+        .modal-body {
+            margin-bottom: 20px;
+        }
+        
+        .detail-item {
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .detail-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        
+        .detail-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--dark-color);
+        }
+        
+        .progress-container {
+            width: 100%;
+            background-color: #e0e0e0;
+            border-radius: 4px;
+            margin-top: 5px;
+        }
+        
+        .progress-bar {
+            height: 20px;
+            border-radius: 4px;
+            text-align: center;
+            line-height: 20px;
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .search-container {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+        }
+        
+        .search-input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .add-printer-form {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        #printerTable th {
+    cursor: pointer;
+    position: relative;
+    padding-right: 20px;
+}
+
+#printerTable th.sort-asc::after {
+    content: '↑';
+    position: absolute;
+    right: 8px;
+}
+
+#printerTable th.sort-desc::after {
+    content: '↓';
+    position: absolute;
+    right: 8px;
+}
+        .add-printer-input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .stats-container {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-card {
+            flex: 1;
+            background-color: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            margin: 10px 0;
+            color: var(--primary-color);
+        }
+        
+        .stat-label {
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+        
+        .critical-card {
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        
+        .critical-card:hover {
+            background-color: #fff3cd;
+            border-color: var(--warning-color);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        
+        .critical-card.active {
+            background-color: #f8d7da;
+            border-color: var(--danger-color);
+        }
+        
+        .ip-link {
+            color: var(--secondary-color);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .ip-link:hover {
+            color: var(--primary-color);
+            text-decoration: underline;
+            transform: scale(1.05);
+        }
+        
+        @media (max-width: 768px) {
+            .modal-content {
+                width: 90%;
+                margin: 10% auto;
+            }
+            
+            .stats-container {
+                flex-direction: column;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+            
+            .toner-info {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-print"></i> Yazıcı Takip Sistemi</h1>
+            <div class="controls">
+                <button class="btn-refresh" onclick="refreshData()">
+                    <i class="fas fa-sync-alt"></i> Yenile
+                </button>
+            </div>
+        </header>
+        
+        <div class="search-container">
+            <input type="text" id="searchInput" class="search-input" placeholder="Yazıcı ara..." onkeyup="searchPrinters()">
+            <button class="btn-primary" onclick="focusSearch()">
+                <i class="fas fa-search"></i>
+            </button>
+        </div>
+        
+        <div class="add-printer-form">
+            <input type="text" id="printerIp" class="add-printer-input" placeholder="Yazıcı IP adresi (örn: 192.168.1.100)">
+            <input type="text" id="printerName" class="add-printer-input" placeholder="Yazıcı Adı (örn: Müdürlük)">
+            <button class="btn-primary" onclick="addPrinter()">
+                <i class="fas fa-plus"></i> Yazıcı Ekle
+            </button>
+        </div>
+        
+        <div class="stats-container" id="statsContainer">
+        </div>
+        
+        <table class="sticky-table" id="printerTable">
+            <thead class="sticky-thead">
+                <tr>
+                    <th onclick="sortTable(0)">Kurum Adı</th>
+                    <th onclick="sortTable(1)">IP Adresi</th>
+                    <th onclick="sortTable(2)">Siyah Toner</th>
+                    <th onclick="sortTable(3)">Mavi Toner</th>
+                    <th onclick="sortTable(4)">Kırmızı Toner</th>
+                    <th onclick="sortTable(5)">Sarı Toner</th>
+                    <th onclick="sortTable(6)">Seri No</th>
+                    <th>İşlemler</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Veriler buraya gelecek -->
+            </tbody>
+        </table>
+
+        <div id="detailsModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title" id="modalTitle">Detaylar</h2>
+                    <span class="close">&times;</span>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+
+    
+
+
+    <script>
+        let currentSort = {
+            column: null,
+            direction: 'asc' // 'asc' veya 'desc'
+        };
+    
+        function sortTable(columnIndex) {
+            const table = document.getElementById('printerTable');
+            if (!table) return;
+            
+            const tbody = table.querySelector('tbody');
+            if (!tbody) return;
+            
+            const rows = Array.from(tbody.querySelectorAll('tr'));
+            if (!rows || rows.length === 0) return;
+            
+            // İşlemler sütununda sıralama yapma
+            if (columnIndex === 7) return;
+            
+            // Aynı sütuna tekrar tıklanırsa sıralama yönünü değiştir
+            if (currentSort.column === columnIndex) {
+                currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
+            } else {
+                currentSort.column = columnIndex;
+                currentSort.direction = 'asc';
+            }
+    
+            rows.sort((a, b) => {
+                try {
+                    const aValue = getCellValue(a, columnIndex);
+                    const bValue = getCellValue(b, columnIndex);
+                    
+                    // Sayısal değerler için (toner yüzdeleri 2-5. sütunlar)
+                    if (columnIndex >= 2 && columnIndex <= 5) {
+                        return currentSort.direction === 'asc' 
+                            ? (aValue - bValue) 
+                            : (bValue - aValue);
+                    }
+                    
+                    // Metin değerleri için (birim adı, IP, seri no)
+                    return currentSort.direction === 'asc'
+                        ? String(aValue).localeCompare(String(bValue))
+                        : String(bValue).localeCompare(String(aValue));
+                } catch (e) {
+                    console.error('Sıralama hatası:', e);
+                    return 0;
+                }
+            });
+    
+            // Tabloyu yeniden oluştur
+            tbody.innerHTML = '';
+            rows.forEach(row => {
+                if (row) tbody.appendChild(row);
+            });
+            
+            // Sıralama okunu güncelle
+            updateSortArrow(columnIndex);
+        }
+    
+        function getCellValue(row, columnIndex) {
+            if (!row || !row.cells || columnIndex < 0 || columnIndex >= row.cells.length) {
+                return columnIndex >= 2 && columnIndex <= 5 ? -1 : '';
+            }
+            
+            const cell = row.cells[columnIndex];
+            if (!cell) {
+                return columnIndex >= 2 && columnIndex <= 5 ? -1 : '';
+            }
+            
+            // Toner sütunları için (2-5. sütunlar)
+            if (columnIndex >= 2 && columnIndex <= 5) {
+                // data-value özelliğini kontrol et
+                if (cell.hasAttribute('data-value')) {
+                    const value = cell.getAttribute('data-value');
+                    return value === '-' ? -1 : parseFloat(value) || -1;
+                }
+                
+                // Hücre içeriğinden yüzde değerini çıkar
+                const percentMatch = cell.textContent.match(/(\d+)%/);
+                return percentMatch ? parseFloat(percentMatch[1]) : -1;
+            }
+            
+            // Diğer sütunlar için normal değer
+            return cell.textContent ? cell.textContent.trim() : '';
+        }
+    
+        function updateSortArrow(columnIndex) {
+            // Tüm başlıklardaki okları temizle
+            const headers = document.querySelectorAll('#printerTable th');
+            if (!headers) return;
+            
+            headers.forEach(th => {
+                if (th) th.classList.remove('sort-asc', 'sort-desc');
+            });
+            
+            // Aktif sütuna ok ekle (işlemler sütunu hariç)
+            if (columnIndex !== 7) {
+                const th = document.querySelector(`#printerTable th:nth-child(${columnIndex + 1})`);
+                if (th) {
+                    th.classList.add(`sort-${currentSort.direction}`);
+                }
+            }
+        }
+    </script>
+<script>
+
+        document.addEventListener('DOMContentLoaded', async function() {
+    await fetchPrinterData();
+
+    document.querySelector('.close').addEventListener('click', function() {
+        document.getElementById('detailsModal').style.display = 'none';
+    });
+
+    window.addEventListener('click', function(event) {
+        if (event.target === document.getElementById('detailsModal')) {
+            document.getElementById('detailsModal').style.display = 'none';
+        }
+    });
+
+    document.getElementById('printerIp').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            addPrinter();
+        }
+    });
+});
+
+async function fetchPrinterData() {
+    try {
+        const response = await fetch('/printer-data');
+        const data = await response.json();
+
+        if (Array.isArray(data)) {
+            populateTable(data);
+            updateStatsFromData(data);
+        } else {
+            console.error('Beklenmeyen veri formatı:', data);
+        }
+    } catch (error) {
+        console.error('Veri çekme hatası:', error);
+        showToast('Veri alınamadı', 'error');
+    }
+}
+
+function updateStatsFromData(data) {
+    const totalPrinters = data.length;
+    let criticalTonerCount = 0;
+    
+    data.forEach(printer => {
+        // Her toner rengi için ayrı ayrı kontrol et
+        if (printer.black && printer.black < 10) criticalTonerCount++;
+        if (printer.cyan && printer.cyan < 10) criticalTonerCount++;
+        if (printer.magenta && printer.magenta < 10) criticalTonerCount++;
+        if (printer.yellow && printer.yellow < 10) criticalTonerCount++;
+    });
+
+    updateStats({
+        totalPrinters,
+        criticalCount: criticalTonerCount
+    });
+}
+function getStatusLabel(percent) {
+    if (percent < 10) return 'Kritik';
+    if (percent < 30) return 'Düşük';
+    return 'NORMAL';
+}
+
+        // Arama kutusuna odaklan
+        function focusSearch() {
+            document.getElementById('searchInput').focus();
+        }
+        
+        // Yazıcı ara
+        function searchPrinters() {
+            const input = document.getElementById('searchInput');
+            const filter = input.value.toUpperCase();
+            const table = document.getElementById('printerTable');
+            const tr = table.getElementsByTagName('tr');
+            
+            for (let i = 1; i < tr.length; i++) {
+                let found = false;
+                const tds = tr[i].getElementsByTagName('td');
+                
+                for (let j = 0; j < tds.length; j++) {
+                    if (tds[j]) {
+                        const txtValue = tds[j].textContent || tds[j].innerText;
+                        if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                            found = true;
+                            break;
+                        }
+                    }
+                }
+                
+                tr[i].style.display = found ? '' : 'none';
+            }
+        }
+        
+        // Verileri yenile
+        function refreshData() {
+            const refreshBtn = document.querySelector('.btn-refresh');
+            refreshBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Yükleniyor...';
+            
+            // Gerçek veri yenileme
+            fetchPrinterData().then(() => {
+                refreshBtn.innerHTML = '<i class="fas fa-sync-alt"></i> Yenile';
+                showToast('Veriler yenilendi', 'success');
+            }).catch(() => {
+                refreshBtn.innerHTML = '<i class="fas fa-sync-alt"></i> Yenile';
+                showToast('Veri yenileme hatası', 'error');
+            });
+        }
+        
+        // Yazıcı silme fonksiyonu
+        function deletePrinter(ip) {
+            if (confirm(`${ip} adresli yazıcıyı silmek istediğinizden emin misiniz?`)) {
+                // API çağrısı yapılacak
+                fetch(`/delete-printer/${ip}`, {
+                    method: 'DELETE'
+                })
+                .then(response => {
+                    if (response.ok) {
+                        showToast('Yazıcı başarıyla silindi!', 'success');
+                        // Tabloyu yenile
+                        fetchPrinterData();
+                    } else {
+                        showToast('Yazıcı silinirken hata oluştu!', 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Silme hatası:', error);
+                    showToast('Yazıcı silinirken hata oluştu!', 'error');
+                });
+            }
+        }
+        
+        // Yazıcı ekle
+        function addPrinter() {
+            const ipInput = document.getElementById('printerIp');
+            const ip = ipInput.value.trim();
+            
+            if (!ip) {
+                showToast('Lütfen IP adresi giriniz', 'error');
+                return;
+            }
+
+            if (!/^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/.test(ip)) {
+                showToast('Lütfen geçerli bir IP adresi giriniz (örn: 192.168.1.100)', 'error');
+                return;
+            }
+
+            const addBtn = document.querySelector('.add-printer-form button');
+            addBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Ekleniyor...';
+            addBtn.disabled = true;
+            
+            // Gerçek API çağrısı
+            fetch('/add-printer', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `ip=${encodeURIComponent(ip)}`
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    ipInput.value = '';
+                    showToast(data.message, 'success');
+                    // Tabloyu yenile
+                    fetchPrinterData();
+                } else {
+                    showToast(data.error || 'Yazıcı eklenirken hata oluştu!', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Ekleme hatası:', error);
+                showToast(`Yazıcı eklenirken hata: ${error.message}`, 'error');
+            })
+            .finally(() => {
+                addBtn.innerHTML = '<i class="fas fa-plus"></i> Yazıcı Ekle';
+                addBtn.disabled = false;
+            });
+        }
+        
+        // İstatistikleri güncelle
+        function updateStats(stats) {
+            const statsContainer = document.getElementById('statsContainer');
+            
+            statsContainer.innerHTML = `
+                <div class="stat-card">
+                    <div class="stat-label">Toplam Yazıcı</div>
+                    <div class="stat-value">${stats.totalPrinters}</div>
+                </div>
+                <div class="stat-card critical-card" onclick="showCriticalPrinters()" style="cursor: pointer;">
+                    <div class="stat-label">Kritik Toner Sayısı</div>
+                    <div class="stat-value" style="color: var(--danger-color);">${stats.criticalCount}</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Son Güncelleme</div>
+                    <div class="stat-value">${new Date().toLocaleTimeString()}</div>
+                </div>
+            `;
+        }
+        
+        // Tabloyu doldur
+        function populateTable(printers) {
+            const tableBody = document.querySelector('#printerTable tbody');
+            tableBody.innerHTML = '';
+            
+            if (printers.length === 0) {
+                const row = document.createElement('tr');
+                row.innerHTML = `<td colspan="8" style="text-align: center;">Kayıtlı yazıcı bulunamadı</td>`;
+                tableBody.appendChild(row);
+                return;
+            }
+            
+            printers.forEach(printer => {
+                const row = document.createElement('tr');
+                
+                // Backend'den gelen kurum bilgisini kullan
+                const unitName = printer.unit || 'Bilinmiyor';
+                
+                // Her toner rengi için ayrı sütun oluştur
+                const blackToner = createTonerCell({ percent: printer.black, status: getStatusLabel(printer.black) });
+                const cyanToner = createTonerCell({ percent: printer.cyan, status: getStatusLabel(printer.cyan) });
+                const magentaToner = createTonerCell({ percent: printer.magenta, status: getStatusLabel(printer.magenta) });
+                const yellowToner = createTonerCell({ percent: printer.yellow, status: getStatusLabel(printer.yellow) });
+                
+                // Seri numarasını backend'den al
+                const serialNumber = printer.serialNo || 'Bilinmiyor';
+                
+                row.innerHTML = `
+                    <td>${unitName}</td>
+                    <td><a href="http://${printer.ip}" target="_blank" class="ip-link">${printer.ip}</a></td>
+                    <td data-value="${printer.black ?? ''}">${blackToner}</td>
+                    <td data-value="${printer.cyan ?? ''}">${cyanToner}</td>
+                    <td data-value="${printer.magenta ?? ''}">${magentaToner}</td>
+                    <td data-value="${printer.yellow ?? ''}">${yellowToner}</td>
+                    <td>${serialNumber}</td>
+                    <td class="action-buttons">
+                        <button class="action-btn" onclick="showDetails('${printer.ip}', 'maintenance')">
+                            <i class="fas fa-tools"></i> Bakım
+                        </button>
+                        <button class="action-btn" onclick="showDetails('${printer.ip}', 'photoconductor')">
+                            <i class="fas fa-drum"></i> Fotokondüktör
+                        </button>
+                        <button class="action-btn delete-btn" onclick="deletePrinter('${printer.ip}')" title="Yazıcıyı Sil">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+                
+                tableBody.appendChild(row);
+            });
+        }
+        
+        // Tek bir toner hücresi oluştur
+        function createTonerCell(tonerData) {
+            if (!tonerData || tonerData.percent === undefined || tonerData.percent === null) {
+                return '<span style="color: #95a5a6;">Bilinmiyor</span>';
+            }
+            
+            const statusClass = tonerData.status ? 
+                `status-${tonerData.status.toLowerCase()}` : 'status-unknown';
+            const statusText = tonerData.status || 'Bilinmiyor';
+            
+            return `
+                <div style="display: flex; align-items: center; gap: 8px; justify-content: center;">
+                    <span style="font-weight: bold;">${tonerData.percent}%</span>
+                    <span class="status-badge ${statusClass}">${statusText}</span>
+                </div>
+            `;
+        }
+        
+        // Durum etiketi oluştur
+        function getStatusLabel(percent) {
+            if (percent === null || percent === undefined) return 'Bilinmiyor';
+            if (percent < 10) return 'Kritik';
+            if (percent < 30) return 'Düşük';
+            return 'NORMAL';
+        }
+        
+        // Kritik tonerleri göster
+        function showCriticalPrinters() {
+            const table = document.getElementById('printerTable');
+            const tbody = table.querySelector('tbody');
+            const rows = tbody.querySelectorAll('tr');
+            const criticalCard = document.querySelector('.critical-card');
+            
+            let isShowingCritical = criticalCard.classList.contains('active');
+            
+            if (isShowingCritical) {
+                // Tüm satırları göster
+                rows.forEach(row => {
+                    row.style.display = '';
+                });
+                criticalCard.classList.remove('active');
+                criticalCard.querySelector('.stat-label').textContent = 'Kritik Toner Sayısı';
+            } else {
+                // Sadece kritik tonerleri olan satırları göster
+                rows.forEach(row => {
+                    const cells = row.querySelectorAll('td');
+                    if (cells.length >= 7) {
+                        const blackValue = parseFloat(cells[2].getAttribute('data-value') || 0);
+                        const cyanValue = parseFloat(cells[3].getAttribute('data-value') || 0);
+                        const magentaValue = parseFloat(cells[4].getAttribute('data-value') || 0);
+                        const yellowValue = parseFloat(cells[5].getAttribute('data-value') || 0);
+                        
+                        const hasCritical = (blackValue > 0 && blackValue < 10) || 
+                                          (cyanValue > 0 && cyanValue < 10) || 
+                                          (magentaValue > 0 && magentaValue < 10) || 
+                                          (yellowValue > 0 && yellowValue < 10);
+                        
+                        row.style.display = hasCritical ? '' : 'none';
+                    }
+                });
+                criticalCard.classList.add('active');
+                criticalCard.querySelector('.stat-label').textContent = 'Tümünü Göster';
+            }
+        }
+        
+        // IP'den birim adını belirle - artık backend'den geliyor
+        function getUnitName(ip) {
+            // Bu fonksiyon artık kullanılmıyor, backend'den gelen unit bilgisi kullanılıyor
+            return 'Bilinmiyor';
+        }
+        
+        // Detayları göster
+        function showDetails(ip, type) {
+            const modal = document.getElementById('detailsModal');
+            const modalContent = document.querySelector('.modal-content');
+            
+            let title = '';
+            let content = '';
+            
+            if (type === 'maintenance') {
+                title = `${ip} - Bakım Kitleri`;
+                content = createMaintenanceHtml(ip);
+            } else if (type === 'photoconductor') {
+                title = `${ip} - Fotokondüktörler`;
+                content = createPhotoconductorHtml(ip);
+            }
+            
+            // Modal header'ı koru, sadece body'yi değiştir
+            const modalHeader = modalContent.querySelector('.modal-header');
+            modalContent.innerHTML = '';
+            modalContent.appendChild(modalHeader);
+            
+            // Yeni content'i ekle
+            const contentDiv = document.createElement('div');
+            contentDiv.innerHTML = content;
+            modalContent.appendChild(contentDiv);
+            
+            document.getElementById('modalTitle').textContent = title;
+            modal.style.display = 'block';
+            
+            // Verileri yükle
+            if (type === 'maintenance') {
+                loadKitData(ip);
+            } else if (type === 'photoconductor') {
+                loadPhotoconductorData(ip);
+            }
+        }
+        
+        // Bakım kiti HTML oluştur
+        function createMaintenanceHtml(ip) {
+            return `
+                <div class="modal-body">
+                    <div id="maintenanceContent">
+                        <div style="text-align: center; padding: 20px;">
+                            <i class="fas fa-spinner fa-spin"></i> Yükleniyor...
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Fotokondüktör HTML oluştur
+        function createPhotoconductorHtml(ip) {
+            return `
+                <div class="modal-body">
+                    <div id="photoconductorContent">
+                        <div style="text-align: center; padding: 20px;">
+                            <i class="fas fa-spinner fa-spin"></i> Yükleniyor...
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Kit verilerini yükle
+        function loadKitData(ip) {
+            fetch(`/kit-data/${ip}`)
+                .then(response => response.json())
+                .then(data => {
+                    const content = document.getElementById('maintenanceContent');
+                    if (data.error) {
+                        content.innerHTML = `<p style="text-align: center; color: red;">${data.error}</p>`;
+                    } else {
+                        content.innerHTML = Object.entries(data).map(([kitName, info]) => `
+                            <div class="detail-item">
+                                <div class="detail-title">${kitName}</div>
+                                <div class="progress-container">
+                                    <div class="progress-bar" style="width: ${info.percent}%; background-color: ${getStatusColor(info.percent)};">
+                                        ${info.percent}%
+                                    </div>
+                                </div>
+                                <p>Durum: <span class="status-badge status-${info.status.toLowerCase()}">${info.status}</span></p>
+                            </div>
+                        `).join('');
+                    }
+                })
+                .catch(error => {
+                    const content = document.getElementById('maintenanceContent');
+                    content.innerHTML = `<p style="text-align: center; color: red;">Veri yüklenirken hata oluştu!</p>`;
+                });
+        }
+        
+        // Fotokondüktör verilerini yükle
+        function loadPhotoconductorData(ip) {
+            fetch(`/photoconductor-data/${ip}`)
+                .then(response => response.json())
+                .then(data => {
+                    const content = document.getElementById('photoconductorContent');
+                    if (data.error) {
+                        content.innerHTML = `<p style="text-align: center; color: red;">${data.error}</p>`;
+                    } else {
+                        content.innerHTML = Object.entries(data).map(([color, info]) => `
+                            <div class="detail-item">
+                                <div class="detail-title">${color.charAt(0).toUpperCase() + color.slice(1)} Fotokondüktör</div>
+                                <div class="progress-container">
+                                    <div class="progress-bar" style="width: ${info.percentFull}%; background-color: ${getStatusColor(info.percentFull)};">
+                                        ${info.percentFull}%
+                                    </div>
+                                </div>
+                            </div>
+                        `).join('');
+                    }
+                })
+                .catch(error => {
+                    const content = document.getElementById('photoconductorContent');
+                    content.innerHTML = `<p style="text-align: center; color: red;">Veri yüklenirken hata oluştu!</p>`;
+                });
+        }
+        
+        function getStatusColor(percent) {
+            if (percent === undefined || percent === null) return '#95a5a6';
+            if (percent < 10) return '#e74c3c';
+            if (percent < 30) return '#f39c12';
+            return '#27ae60';
+        }
+        
+        function showToast(message, type) {
+            // Toast container oluştur
+            let toastContainer = document.getElementById('toast-container');
+            if (!toastContainer) {
+                toastContainer = document.createElement('div');
+                toastContainer.id = 'toast-container';
+                toastContainer.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    z-index: 10000;
+                    max-width: 400px;
+                `;
+                document.body.appendChild(toastContainer);
+            }
+
+            // Toast elementi oluştur
+            const toast = document.createElement('div');
+            toast.style.cssText = `
+                background: ${type === 'success' ? '#27ae60' : type === 'error' ? '#e74c3c' : '#3498db'};
+                color: white;
+                padding: 12px 20px;
+                margin-bottom: 10px;
+                border-radius: 4px;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+                font-size: 14px;
+                font-weight: 500;
+                opacity: 0;
+                transform: translateX(100%);
+                transition: all 0.3s ease;
+                cursor: pointer;
+            `;
+            toast.textContent = message;
+
+            // Toast'u ekle
+            toastContainer.appendChild(toast);
+
+            // Animasyon
+            setTimeout(() => {
+                toast.style.opacity = '1';
+                toast.style.transform = 'translateX(0)';
+            }, 100);
+
+            // 5 saniye sonra kaldır
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(100%)';
+                setTimeout(() => {
+                    if (toast.parentNode) {
+                        toast.parentNode.removeChild(toast);
+                    }
+                }, 300);
+            }, 5000);
+
+            // Tıklayarak kapatma
+            toast.addEventListener('click', () => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(100%)';
+                setTimeout(() => {
+                    if (toast.parentNode) {
+                        toast.parentNode.removeChild(toast);
+                    }
+                }, 300);
+            });
+        }
+        
+    </script>
+
+    
+</body>
+</html>
