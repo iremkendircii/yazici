@@ -474,7 +474,7 @@
         },
         "feedOrientation": "long-edge",
         "inserted": 1,
-        "isSizeSenseEnabled": 0,
+        "isSizeSenseEnabled": 1,
         "isStandard": 1,
         "levelInfo": {
           "currentLevel": 100,
@@ -621,7 +621,7 @@
         },
         "feedOrientation": "short-edge",
         "inserted": 1,
-        "isSizeSenseEnabled": 0,
+        "isSizeSenseEnabled": 1,
         "isStandard": 1,
         "levelInfo": {
           "currentLevel": 100,
