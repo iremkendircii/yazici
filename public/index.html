@@ -15,7 +15,26 @@
     />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sortable/0.8.0/js/sortable.min.js"></script>
 
+    <script>
+      // Sayfa yüklendiğinde kimlik doğrulama kontrolü
+      window.addEventListener("DOMContentLoaded", function () {
+        // sessionStorage'da 'authenticated' anahtarı yoksa veya değeri 'true' değilse
+        if (sessionStorage.getItem("authenticated") !== "true") {
+          // login sayfasına yönlendir
+          window.location.href = "login.html";
+        }
+      });
+    </script>
+
     <style>
+      .content {
+        max-width: 800px;
+        padding: 40px;
+        background: rgba(0, 0, 0, 0.5);
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      }
+
       :root {
         --primary-color: #2c3e50;
         --secondary-color: #3498db;
@@ -506,12 +525,27 @@
     <div class="container">
       <header>
         <h1><i class="fas fa-print"></i> Yazıcı Takip Sistemi</h1>
+
         <div class="controls">
           <button class="btn-refresh" onclick="refreshData()">
             <i class="fas fa-sync-alt"></i> Yenile
           </button>
         </div>
       </header>
+
+      <!-- <div class="container">
+        <div class="content">
+          <h1>Başarıyla Giriş Yaptınız!</h1>
+          <p>
+            Tebrikler, doğru şifreyle giriş yaptınız ve index.html sayfasına
+            erişim izniniz var.
+          </p>
+          <p>
+            Bu sayfa sadece doğru şifreyi giren kullanıcılar tarafından
+            görüntülenebilir.
+          </p>
+        </div>
+      </div> -->
 
       <div class="search-container">
         <input
