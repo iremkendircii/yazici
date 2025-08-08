@@ -469,6 +469,10 @@
       }
 
       /* Başlık renkleri */
+      .color-width {
+        width: 100px;
+      }
+
       .th-black {
         background-color: #000000 !important;
       }
@@ -546,12 +550,15 @@
       <table id="printerTable">
         <thead class="sticky-thead">
           <tr>
-            <th onclick="sortTable(0)">Kurum Adı</th>
+            <th onclick="sortTable(0)">Konum</th>
             <th onclick="sortTable(1)">IP Adresi</th>
-            <th onclick="sortTable(2)" class="th-black">Siyah Toner</th>
-            <th onclick="sortTable(3)" class="th-cyan">Mavi Toner</th>
-            <th onclick="sortTable(4)" class="th-magenta">Kırmızı Toner</th>
-            <th onclick="sortTable(5)" class="th-yellow">Sarı Toner</th>
+            <th onclick="sortTable(7)">Son Görülme</th>
+            <th onclick="sortTable(2)" class="th-black color-width">Siyah</th>
+            <th onclick="sortTable(3)" class="th-cyan color-width">Mavi</th>
+            <th onclick="sortTable(4)" class="th-magenta color-width">
+              Kırmızı
+            </th>
+            <th onclick="sortTable(5)" class="th-yellow color-width">Sarı</th>
             <th onclick="sortTable(6)">Seri No</th>
             <th>İşlemler</th>
           </tr>
@@ -918,14 +925,39 @@
         printers.forEach((printer) => {
           const row = document.createElement("tr");
 
+          // Tarih formatlama
+          const lastModified = printer.lastModified
+            ? new Date(printer.lastModified).toLocaleString("tr-TR")
+            : "X";
+
           // Backend'den gelen kurum bilgisini kullan
-          const unitName = printer.unit || "Bilinmiyor";
+          const unitName = printer.unit || "X";
+
+          // // IP'ye özel URL oluştur
+          // const printerUrl = `http://${printer.ip}/esf/prtappauth/admin/configureshellservlet?SelectedApp=ssa_network&RequestType=ExternalRequest`;
+
+          // function showConfigure(ip) {
+          //   // Yazıcının ağ yapılandırma sayfası URL'si
+          //   const configUrl = `http://${ip}/web/guest/tr/websys/network/configLAN.cgi`;
+
+          //   // URL'nin geçerli olup olmadığını kontrol et
+          //   try {
+          //     new URL(configUrl); // URL geçerli mi diye kontrol
+          //     window.open(configUrl, "_blank", "noopener,noreferrer");
+          //   } catch (e) {
+          //     console.error("Geçersiz URL:", e);
+          //     alert(
+          //       "Geçersiz yazıcı adresi veya yapılandırma sayfası bulunamadı!"
+          //     );
+          //   }
+          // }
 
           row.innerHTML = `
       <td>${unitName}</td>
       <td><a href="http://${printer.ip}" target="_blank" class="ip-link">${
             printer.ip
           }</a></td>
+           <td>${lastModified}</td>
       <td class="toner-black" data-value="${
         printer.black ?? ""
       }">${createTonerCell({
@@ -950,7 +982,7 @@
             percent: printer.yellow,
             status: getStatusLabel(printer.yellow),
           })}</td>
-      <td>${printer.serialNo || "Bilinmiyor"}</td>
+      <td>${printer.serialNo || "X"}</td>
       <td class="action-buttons">
         <button class="action-btn" onclick="showDetails('${
           printer.ip
@@ -961,6 +993,12 @@
           printer.ip
         }', 'photoconductor')">
           <i class="fas fa-drum"></i> Fotokondüktör
+        </button>
+       <button class="action-btn" onclick="showConfigure('${printer.ip}')">
+          <i class="fas fa-network-wired"></i>Config
+
+          
+
         </button>
         <button class="action-btn delete-btn" onclick="deletePrinter('${
           printer.ip
@@ -981,25 +1019,24 @@
           tonerData.percent === undefined ||
           tonerData.percent === null
         ) {
-          return '<span style="color: #95a5a6;">Bilinmiyor</span>';
+          return '<span style="color: #95a5a6;">X</span>';
         }
 
         const statusClass = tonerData.status
           ? `status-${tonerData.status.toLowerCase()}`
           : "status-unknown";
-        const statusText = tonerData.status || "Bilinmiyor";
+        const statusText = tonerData.status || "X";
 
         return `
-                <div style="display: flex; align-items: center; gap: 8px; justify-content: center;">
-                    <span style="font-weight: bold;">${tonerData.percent}%</span>
-                    <span class="status-badge ${statusClass}">${statusText}</span>
+                <div style="display: flex; align-items: center; gap: 8px; justify-content: center;"> 
+                    <span class="status-badge ${statusClass}">${tonerData.percent}%</span>
                 </div>
             `;
       }
 
       // Durum etiketi oluştur
       function getStatusLabel(percent) {
-        if (percent === null || percent === undefined) return "Bilinmiyor";
+        if (percent === null || percent === undefined) return "X";
         if (percent < 10) return "Kritik";
         if (percent < 30) return "Düşük";
         return "NORMAL";
@@ -1058,7 +1095,7 @@
       // IP'den birim adını belirle - artık backend'den geliyor
       function getUnitName(ip) {
         // Bu fonksiyon artık kullanılmıyor, backend'den gelen unit bilgisi kullanılıyor
-        return "Bilinmiyor";
+        return "X";
       }
 
       // Detayları göster

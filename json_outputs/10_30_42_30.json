@@ -474,7 +474,7 @@
         },
         "feedOrientation": "long-edge",
         "inserted": 1,
-        "isSizeSenseEnabled": 0,
+        "isSizeSenseEnabled": 1,
         "isStandard": 1,
         "levelInfo": {
           "currentLevel": 100,
@@ -874,6 +874,46 @@
         "display": "OutputBinsStatus",
         "name": "OutputBinsStatus",
         "type": "Node"
+      },
+      "ParkedJobs": {
+        "children": [
+          "ParkedJobsList"
+        ],
+        "display": "Panel",
+        "hideshows": [
+          {
+            "condition": "HAS_DISK",
+            "runtime": 1
+          }
+        ],
+        "name": "ParkedJobs",
+        "title": {
+          "id": "TXT_DEVICE_JOBS_NEEDING_SUPPLIES",
+          "textId": 70363,
+          "translated": "Jobs Needing Supplies"
+        },
+        "type": "Container"
+      },
+      "ParkedJobsList": {
+        "display": "BasicTable",
+        "emptyText": {
+          "id": "TXT_EMPTY_QUEUE"
+        },
+        "headers": [
+          {
+            "field": "jobType",
+            "id": "TXT_JOB_TYPE"
+          },
+          {
+            "field": "missingResource",
+            "id": "TXT_STATUS"
+          }
+        ],
+        "name": "ParkedJobsList",
+        "paging": 0,
+        "readonly": 1,
+        "setting": "PARKEDJOBS_LIST",
+        "type": "ParkedJobsList"
       },
       "PCDrumStatus": {
         "children": [],
@@ -1752,7 +1792,22 @@
     },
     "rootNode": "Status",
     "schedules": {},
-    "settings": {},
+    "settings": {
+      "PARKEDJOBS_LIST": {
+        "data": [],
+        "headers": [
+          {
+            "field": "jobType",
+            "id": "TXT_JOB_TYPE"
+          },
+          {
+            "field": "missingResource",
+            "id": "TXT_STATUS"
+          }
+        ],
+        "id": "PARKEDJOBS_LIST"
+      }
+    },
     "status": {},
     "supplies": {
       "200K HCF Maintenance Kit": {
@@ -1995,7 +2050,7 @@
         "percentFull": 99,
         "prebate": 1,
         "revisionLevel": 0,
-        "serialNumber": "LEX38F4584",
+        "serialNumber": "LEX38F4585",
         "Statuses": [
           {
             "behaviorID": -1,
@@ -2316,7 +2371,7 @@
         "percentFull": 99,
         "prebate": 1,
         "revisionLevel": 0,
-        "serialNumber": "LEX3aF4584",
+        "serialNumber": "LEX3aF4585",
         "Statuses": [
           {
             "behaviorID": -1,
@@ -2902,7 +2957,7 @@
         "percentFull": 100,
         "prebate": 1,
         "revisionLevel": 0,
-        "serialNumber": "LEX70F4584",
+        "serialNumber": "LEX70F4585",
         "Statuses": [
           {
             "behaviorID": -1,
@@ -3034,7 +3089,7 @@
         "cartridgeType": 0,
         "color": "Yellow",
         "configResettable": 0,
-        "curlevel": 55,
+        "curlevel": 54,
         "currentStatus": "Tamam",
         "currentStatusEnum": 0,
         "currentStatusText": 67896,
@@ -3102,7 +3157,7 @@
         "npaId": 4,
         "pagesRemaining": -1,
         "partNumber": "",
-        "percentFull": 55,
+        "percentFull": 54,
         "prebate": 1,
         "revisionLevel": 0,
         "serialNumber": "LEX01022002003010045019002255",
